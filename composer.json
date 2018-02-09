@@ -1,0 +1,20 @@
+{
+    "name": "mcmaroon/mcps_image_regenerate",
+    "description": "mcps_image_regenerate",
+    "keywords": ["prestashop", "image", "regenerate"],
+    "homepage": "https://github.com/mcmaroon/mcps_image_regenerate",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mcmaroon"
+        }
+    ],
+    "require": {
+        "symfony/console": "^3.4"
+    },
+    "autoload": {
+        "psr-4": { 
+            "MCPS\\ImageRegenerate\\": ""
+        }
+    }
+}
