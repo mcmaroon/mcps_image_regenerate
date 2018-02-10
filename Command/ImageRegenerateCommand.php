@@ -28,6 +28,9 @@ class ImageRegenerateCommand extends Command
                     'type', 't', InputOption::VALUE_OPTIONAL, 'Name for the image type', 'all'
                 ),
                 new InputOption(
+                    'format', 'f', InputOption::VALUE_OPTIONAL, 'Name for the image format', 'all'
+                ),
+                new InputOption(
                     'deleteOldImages', 'd', InputOption::VALUE_NONE, 'Erase previous images'
                 ),
         ));
@@ -38,6 +41,7 @@ class ImageRegenerateCommand extends Command
         $this->output = $output;
         $projectdir = $input->getArgument('projectdir');
         $type = $input->getOption('type');
+        $format = $input->getOption('format');
         $deleteOldImages = $input->getOption('deleteOldImages');
 
         if (!file_exists($projectdir)) {
@@ -52,19 +56,56 @@ class ImageRegenerateCommand extends Command
         define('_PS_ADMIN_DIR_', $projectdir . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR . 'admin');
         require_once($configPath);
 
-        $this->output(sprintf('PS VERSION: %s', _PS_VERSION_), 'info');
+        $this->write('PROJECT DIRECTORY ', 'info');
+        $this->write($projectdir);
+        $this->write(' PS VERSION ', 'info');
+        $this->writeln(_PS_VERSION_);
+
+        $this->write('CONFIGURATION: type: ', 'info');
+        $this->write($type);
+        $this->write(' format: ', 'info');
+        $this->write($format);
+        $this->write(' deleteOldImages: ', 'info');
+        $this->writeln($deleteOldImages);
 
         require_once('Controller' . DIRECTORY_SEPARATOR . 'AdminImagesController.php');
+        $_GET['format_' . $type] = $this->convertFormatToDbValue($type, $format); // AdminImagesControllerCore Line 657
+
         $aic = new \AdminImagesController();
         $aic->setCommand($this);
         $aic->_regenerateThumbnails($type, $deleteOldImages);
     }
 
-    public final function output($string, $style = '')
+    protected function convertFormatToDbValue($type, $inputformat)
+    {
+        if (class_exists('ImageType') && $type != 'all') {
+            $formats = \ImageType::getImagesTypes($type);
+            foreach ($formats as $format) {
+                if ($format['name'] === $inputformat) {
+                    return $format['id_image_type'];
+                }
+            }
+        }
+
+        return 'all';
+    }
+
+    protected function writeStyle($string, $style)
     {
         if (strlen($style)) {
             $string = '<' . $style . '>' . $string . '</' . $style . '>';
         }
-        $this->output->writeln($string);
+
+        return $string;
+    }
+
+    public final function write($string, $style = '')
+    {
+        $this->output->write($this->writeStyle($string, $style));
+    }
+
+    public final function writeln($string, $style = '')
+    {
+        $this->output->writeln($this->writeStyle($string, $style));
     }
 }
