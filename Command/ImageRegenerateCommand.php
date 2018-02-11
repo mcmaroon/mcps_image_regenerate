@@ -4,9 +4,7 @@ namespace MCPS\ImageRegenerate\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
@@ -14,24 +12,25 @@ class ImageRegenerateCommand extends Command
 {
 
     private $output;
+    private $progress;
 
     protected function configure()
     {
         $this
-            ->setName('mcps:image-regenerate')
+            ->setName('image-regenerate')
             ->setDescription('Regenerate Prestashop Images')
             ->setDefinition(array(
                 new InputArgument(
                     'projectdir', InputArgument::OPTIONAL, 'The main project directory', getcwd()
                 ),
                 new InputOption(
-                    'type', 't', InputOption::VALUE_OPTIONAL, 'Name for the image type', 'all'
+                    'type', null, InputOption::VALUE_OPTIONAL, 'Name for the image type', 'all'
                 ),
                 new InputOption(
-                    'format', 'f', InputOption::VALUE_OPTIONAL, 'Name for the image format', 'all'
+                    'format', null, InputOption::VALUE_OPTIONAL, 'Name for the image format', 'all'
                 ),
                 new InputOption(
-                    'deleteOldImages', 'd', InputOption::VALUE_NONE, 'Erase previous images'
+                    'erase', null, InputOption::VALUE_NONE, 'Erase previous images'
                 ),
         ));
     }
@@ -42,7 +41,7 @@ class ImageRegenerateCommand extends Command
         $projectdir = $input->getArgument('projectdir');
         $type = $input->getOption('type');
         $format = $input->getOption('format');
-        $deleteOldImages = $input->getOption('deleteOldImages');
+        $erase = $input->getOption('erase');
 
         if (!file_exists($projectdir)) {
             throw new \InvalidArgumentException(sprintf('Invalid projectdir. %s not exists', $projectdir));
@@ -65,15 +64,19 @@ class ImageRegenerateCommand extends Command
         $this->write($type);
         $this->write(' format: ', 'info');
         $this->write($format);
-        $this->write(' deleteOldImages: ', 'info');
-        $this->writeln($deleteOldImages);
+        $this->write(' erase: ', 'info');
+        $this->writeln($erase);
 
         require_once('Controller' . DIRECTORY_SEPARATOR . 'AdminImagesController.php');
+        require_once('Controller' . DIRECTORY_SEPARATOR . 'ImageManager.php');
         $_GET['format_' . $type] = $this->convertFormatToDbValue($type, $format); // AdminImagesControllerCore Line 657
+
+        $r = new \ImageManager();
+        $r->setCommand($this);
 
         $aic = new \AdminImagesController();
         $aic->setCommand($this);
-        $aic->_regenerateThumbnails($type, $deleteOldImages);
+        $aic->_regenerateThumbnails($type, $erase);
     }
 
     protected function convertFormatToDbValue($type, $inputformat)
@@ -107,5 +110,22 @@ class ImageRegenerateCommand extends Command
     public final function writeln($string, $style = '')
     {
         $this->output->writeln($this->writeStyle($string, $style));
+    }
+
+    public final function progressStart()
+    {
+        $this->progress = new ProgressBar($this->output);
+        $this->progress->setFormat('%current% [%bar%] <info>%message:3s%</info>');
+    }
+
+    public final function progressAdvance($sourceFile)
+    {
+        $this->progress->advance();
+        $this->progress->setMessage('Source File:' . $sourceFile);
+    }
+
+    public final function progressEnd()
+    {
+        $this->progress->finish();
     }
 }
