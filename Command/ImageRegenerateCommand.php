@@ -115,13 +115,14 @@ class ImageRegenerateCommand extends Command
     public final function progressStart()
     {
         $this->progress = new ProgressBar($this->output);
+        $this->progress->setBarWidth(10);
         $this->progress->setFormat('%current% [%bar%] <info>%message:3s%</info>');
     }
 
     public final function progressAdvance($sourceFile)
     {
         $this->progress->advance();
-        $this->progress->setMessage('Source File:' . $sourceFile);
+        $this->progress->setMessage('File:' . $sourceFile);
     }
 
     public final function progressEnd()
