@@ -67,9 +67,16 @@ class ImageRegenerateCommand extends Command
         $this->write(' erase: ', 'info');
         $this->writeln($erase);
 
+        $psCipherAlgorithm = \Configuration::get('PS_CIPHER_ALGORITHM');
+        if ($psCipherAlgorithm) {
+            $this->write('PS_CIPHER_ALGORITHM: ', 'comment');
+            $this->write('true');
+        }
+
         require_once('Controller' . DIRECTORY_SEPARATOR . 'AdminImagesController.php');
         require_once('Controller' . DIRECTORY_SEPARATOR . 'ImageManager.php');
         $_GET['format_' . $type] = $this->convertFormatToDbValue($type, $format); // AdminImagesControllerCore Line 657
+
 
         $r = new \ImageManager();
         $r->setCommand($this);
@@ -117,6 +124,7 @@ class ImageRegenerateCommand extends Command
         $this->progress = new ProgressBar($this->output);
         $this->progress->setBarWidth(10);
         $this->progress->setFormat('%current% [%bar%] <info>%message:3s%</info>');
+        $this->progress->setMessage('');
     }
 
     public final function progressAdvance($sourceFile)
@@ -127,6 +135,7 @@ class ImageRegenerateCommand extends Command
 
     public final function progressEnd()
     {
+        $this->progress->setMessage('');
         $this->progress->finish();
     }
 }
