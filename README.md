@@ -2,6 +2,8 @@
 
 Compatible with versions 1.6.x - 1.7.x
 
+![Screenshot](docs/images/screen.png)
+
 ### Installing
 
 1) Close the repository
