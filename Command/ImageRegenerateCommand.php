@@ -18,10 +18,10 @@ class ImageRegenerateCommand extends Command
     {
         $this
             ->setName('image-regenerate')
-            ->setDescription('Regenerate Prestashop Images')
+            ->setDescription('Regenerates thumbnails for all existing images')
             ->setDefinition(array(
-                new InputArgument(
-                    'projectdir', InputArgument::OPTIONAL, 'The main project directory', getcwd()
+                new InputOption(
+                    'dir', null, InputOption::VALUE_REQUIRED, 'Main directory of the prestashop project', getcwd()
                 ),
                 new InputOption(
                     'type', null, InputOption::VALUE_OPTIONAL, 'Name for the image type', 'all'
@@ -38,25 +38,25 @@ class ImageRegenerateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
-        $projectdir = $input->getArgument('projectdir');
+        $dir = $input->getOption('dir');
         $type = $input->getOption('type');
         $format = $input->getOption('format');
-        $erase = $input->getOption('erase');
+        $erase = (boolean) $input->getOption('erase');
 
-        if (!file_exists($projectdir)) {
-            throw new \InvalidArgumentException(sprintf('Invalid projectdir. %s not exists', $projectdir));
+        if (!file_exists($dir)) {
+            throw new \InvalidArgumentException(sprintf('Invalid dir. %s not exists', $dir));
         }
 
-        $configPath = $projectdir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.inc.php';
+        $configPath = $dir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.inc.php';
         if (!file_exists($configPath)) {
-            throw new \RuntimeException(sprintf('Prestahop %s not exists', $configPath));
+            throw new \RuntimeException(sprintf('Cannot find the %s file in the given directory %s', $configPath, $dir));
         }
 
-        define('_PS_ADMIN_DIR_', $projectdir . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR . 'admin');
+        define('_PS_ADMIN_DIR_', $dir . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR . 'admin');
         require_once($configPath);
 
         $this->write('PROJECT DIRECTORY ', 'info');
-        $this->write($projectdir);
+        $this->write($dir);
         $this->write(' PS VERSION ', 'info');
         $this->writeln(_PS_VERSION_);
 
@@ -65,7 +65,7 @@ class ImageRegenerateCommand extends Command
         $this->write(' format: ', 'info');
         $this->write($format);
         $this->write(' erase: ', 'info');
-        $this->writeln($erase);
+        $this->writeln(($erase ? 'true' : 'false'));
 
         $psCipherAlgorithm = \Configuration::get('PS_CIPHER_ALGORITHM');
         if ($psCipherAlgorithm) {
@@ -73,8 +73,8 @@ class ImageRegenerateCommand extends Command
             $this->write('true');
         }
 
-        require_once('Controller' . DIRECTORY_SEPARATOR . 'AdminImagesController.php');
-        require_once('Controller' . DIRECTORY_SEPARATOR . 'ImageManager.php');
+        require_once(__DIR__ . '/../Override' . DIRECTORY_SEPARATOR . 'AdminImagesController.php');
+        require_once(__DIR__ . '/../Override' . DIRECTORY_SEPARATOR . 'ImageManager.php');
         $_GET['format_' . $type] = $this->convertFormatToDbValue($type, $format); // AdminImagesControllerCore Line 657
 
 

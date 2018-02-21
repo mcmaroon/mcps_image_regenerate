@@ -16,7 +16,7 @@ class AdminImagesController extends AdminImagesControllerCore
     {
         parent::_regenerateThumbnails($type, $deleteOldImages);
         if (count($this->errors)) {
-			self::$command->writeln('');
+            self::$command->writeln('');
             self::$command->writeln(sprintf('Completed with (%s) errors', count($this->errors)), 'error');
             foreach ($this->errors as $errorMessage) {
                 self::$command->writeln($errorMessage, 'error');
