@@ -32,9 +32,6 @@ or being in the main directory of a prestashop project
 
 `psimgr --erase`
 
-### Usage
-
-
 ## Authors
 
 * **Marek Ciarkowski** - [mcmaroon](https://github.com/mcmaroon)
