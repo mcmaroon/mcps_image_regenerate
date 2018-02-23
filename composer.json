@@ -1,12 +1,13 @@
 {
     "name": "mcmaroon/mcps_image_regenerate",
-    "description": "mcps_image_regenerate",
-    "keywords": ["prestashop", "image", "regenerate"],
+    "description": "Console tool for quickly generating images for PrestaShop store.",
+    "keywords": ["php", "cli", "mit", "command-line-tool", "prestashop", "image", "image-processing", "regenerate"],
     "homepage": "https://github.com/mcmaroon/mcps_image_regenerate",
     "license": "MIT",
     "authors": [
         {
-            "name": "mcmaroon"
+            "name": "mcmaroon",
+            "email": "mcmaroonmc@gmail.com"
         }
     ],
     "require": {
