@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "symfony/console": "2.0.x-dev"
+        "symfony/console": "^3.4"
     },
     "autoload": {
         "psr-4": { 

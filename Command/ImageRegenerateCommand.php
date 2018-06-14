@@ -129,7 +129,7 @@ class ImageRegenerateCommand extends Command
 
     public final function progressAdvance($sourceFile)
     {
-        //$this->progress->advance();
+        $this->progress->advance();
         $this->progress->setMessage('File:' . $sourceFile);
     }
 

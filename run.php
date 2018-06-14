@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Application;
@@ -11,7 +11,5 @@ $input = new ArgvInput();
 $command = new ImageRegenerateCommand();
 $application = new Application();
 $application->add($command);
-if (method_exists($application, 'setDefaultCommand')) {
-    $application->setDefaultCommand($command->getName());
-}
+$application->setDefaultCommand($command->getName());
 $application->run($input);
